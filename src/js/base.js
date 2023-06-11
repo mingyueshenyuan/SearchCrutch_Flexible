@@ -10,9 +10,26 @@ if (typeof browser === "undefined" && typeof chrome === "object") {
     var browser = chrome; //On Chrome
     isChrome = true;
 }
-var search_custom_num = 15;
-var search_array = ["google", "baidu", "bing", "sogou"];
+var search_custom_num = 0;
+function setCustomNum(num) {
+    //alert("---:"+num);
+    search_custom_num = num;
+}
 
+function loadNumFromlocalStorage() {
+    var count = localStorage.getItem("custom_num");
+    if (count == null) {
+        count = 5;
+    }
+    setCustomNum(parseInt(count));
+}
+var search_array = ["google", "baidu", "bing", "sogou"];
+function getSearchselect_arrayLength() {
+    return searchselect_array.length;
+}
+function getStaticLength() {
+    return 4;
+}
 var searchselect_array =
     [
         ["Google", "https://www.google.com/search?q=", "q", "https://www.google.com"],
@@ -38,46 +55,64 @@ chrome.extension.onRequest.addListener(function (request, sender, sendResponse) 
 })
 
 
+
 function searchClick(info) {
-    let arr = JSON.parse(localStorage.getItem("searchArray"))
-    var itemId = info.menuItemId
-    var keyword = info.selectionText
-    var searchUrl = searchselect_array[arr[itemId]][1]
-    searchUrl = searchUrl.replace(/%s/i, '') + encodeURIComponent(keyword)
-    chrome.tabs.create({url: searchUrl});
+
+    let arr = JSON.parse(localStorage.getItem("searchArray"));
+
+    var itemId = info.menuItemId;
+    var keyword = info.selectionText;
+    //alert(itemId + "搜索信息：" + keyword);
+    var searchUrl = searchselect_array[arr[itemId]][1];
+    searchUrl = searchUrl.replace(/%s/i, encodeURIComponent(keyword));
+    //searchUrl = searchUrl.replace(/%s/i, encodeURIComponent(keyword));
+    chrome.tabs.create({ url: searchUrl });
 }
 
 
-function createMenu() {
+async function createMenu() {
+   await chrome.contextMenus.removeAll();
+    //alert("移除成功");
     let arr = {};
-    chrome.contextMenus.removeAll()
-    for (let i = 0; i < 4; i++) {
+    //var caidan = "";
+    var startIndex = getStaticLength();
+    for (let i = 0; i < startIndex; i++) {
         let cb_id = "cb_" + i;
         if (localStorage[cb_id] === 'checked') {
             let setting = {
+                id: cb_id,
                 title: searchselect_array[i][0],
                 contexts: ["selection"],
                 onclick: searchClick,
             };
-            const id = chrome.contextMenus.create(setting);
+            const id=await chrome.contextMenus.create(setting);
+            //const id = chrome.contextMenus.create(setting);
             arr[id] = i
+            //caidan += "\n" + i + searchselect_array[i][0];
         }
     }
+    loadNumFromlocalStorage();
 
-    for (let i = 4; i < search_custom_num + 4; i++) {
+    for (let i = startIndex; i < search_custom_num + startIndex; i++) {
         let cb_id = "cb_" + i;
-        const cb_name = 'custom_name_' + (i - 4);
+        const cb_name = 'custom_name_' + (i - startIndex);
         if (localStorage[cb_id] === 'checked') {
             let setting = {
-                title: localStorage[cb_name],
+                id: cb_id,
+                title: localStorage.getItem(cb_name),
                 contexts: ["selection"],
                 onclick: searchClick,
             };
-            const cid = chrome.contextMenus.create(setting);
-            arr[cid] = i
+            const cid =await chrome.contextMenus.create(setting);
+            //const cid = chrome.contextMenus.create(setting);
+            arr[cid] = i;
+            //caidan += "\n" + i+":"+cb_name+":"+localStorage.getItem(cb_name);
         }
     }
-    localStorage.setItem("searchArray", JSON.stringify(arr))
+
+    //alert("创建菜单" + caidan);
+    localStorage.setItem("searchArray", JSON.stringify(arr));
+
 }
 
 
@@ -204,7 +239,8 @@ function getSearch(host) {
 
 function dataBackup() {
     var data = new Object();
-    for (var i = 0; i < searchselect_array.length + search_custom_num; i++) {
+    data["custom_num"] = search_custom_num;
+    for (var i = 0; i < getSearchselect_arrayLength() + search_custom_num; i++) {
         var cb_id = "cb_" + i;
         data[cb_id] = localStorage[cb_id];
     }
@@ -231,6 +267,8 @@ function dataBackup() {
 }
 
 function dataRecover() {
+    loadNumFromlocalStorage();
+
     for (var i = 0; i < search_array.length + search_custom_num; i++) {
         var cb_id = "cb_" + i;
         if (isChrome) {
@@ -293,4 +331,4 @@ function dataRecover() {
 }
 
 
-createMenu()
+createMenu();

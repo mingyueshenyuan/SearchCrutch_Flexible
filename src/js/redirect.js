@@ -1,23 +1,16 @@
 /* global $ insertCustomArray GetHost inHostArray GetUrlParms searchhost_array searchselect_array SetNowLink */
-$("a_0").addEventListener("click", CheckRedirect);        //谷歌
-$("a_1").addEventListener("click", CheckRedirect);        //替代谷歌的搜索引擎
-$("a_2").addEventListener("click", CheckRedirect);        //百度
-$("a_3").addEventListener("click", CheckRedirect);        //必应
-$("a_4").addEventListener("click", CheckRedirect);        //雅虎
-$("a_5").addEventListener("click", CheckRedirect);        //搜狗
-$("a_6").addEventListener("click", CheckRedirect);        //360搜索
-$("a_7").addEventListener("click", CheckRedirect);        //自定义搜索1
-$("a_8").addEventListener("click", CheckRedirect);        //自定义搜索2
-$("a_9").addEventListener("click", CheckRedirect);        //自定义搜索3
-$("a_10").addEventListener("click", CheckRedirect);       //自定义搜索4
-$("a_11").addEventListener("click", CheckRedirect);       //自定义搜索5
-$("a_12").addEventListener("click", CheckRedirect);       //自定义搜索6
-$("a_13").addEventListener("click", CheckRedirect);       //自定义搜索7
-$("a_14").addEventListener("click", CheckRedirect);       //自定义搜索8
-$("a_15").addEventListener("click", CheckRedirect);       //自定义搜索8
-$("a_16").addEventListener("click", CheckRedirect);       //自定义搜索8
-$("a_17").addEventListener("click", CheckRedirect);       //自定义搜索8
-$("a_18").addEventListener("click", CheckRedirect);       //自定义搜索8
+
+AddCheckRedirect();
+function AddCheckRedirect(){
+    var count=parseInt(search_custom_num)+getStaticLength();
+    for (i = 0; i < count; i++) {
+        //获取id为cb_i的元素
+        var _CheckRedirect = "a_"+ i;
+        //给获取到的元素添加点击事件的监听器
+        $(_CheckRedirect).addEventListener("click", CheckRedirect);
+      }
+}
+
 
 function CheckRedirect() {
     var index = this.id.substr("a_".length);

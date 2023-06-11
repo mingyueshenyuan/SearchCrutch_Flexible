@@ -4,7 +4,8 @@ window.addEventListener("load", restore_options);
 // Restores select box state to saved value from localStorage.
 function restore_options() {
     window.removeEventListener("load", restore_options, false);
-    for (var i = 0; i < searchselect_array.length + search_custom_num; i++) {
+    loadNumFromlocalStorage();
+    for (var i = 0; i < getSearchselect_arrayLength() + search_custom_num; i++) {
         var cb_id = "cb_" + i;
         if ("no" === localStorage[cb_id])
             $(cb_id).checked = "";

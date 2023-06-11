@@ -17,7 +17,8 @@
   "permissions" : [
     "tabs","*://*/*",
     "storage",
-    "contextMenus"
+    "contextMenus",
+    "downloads"
   ],
   "options_ui": {
     "page": "options.html"
